@@ -13,3 +13,10 @@ code inspired from "https://www.binpress.com/simulating-segregation-with-python/
 ```bash
 $conda env create -f environment.yml
 ```
+
+
+## Execution
+- activate your conda environment
+```bash
+python demo.py
+```
