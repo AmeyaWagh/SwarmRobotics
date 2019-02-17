@@ -1,21 +1,49 @@
-
 #!/bin/python
 
-from lib.SchellingModel import Schelling
+from lib.experimentFactory import experimentFactory
 import os
+import inspect
+
+
+CONFIG = {  
+            "width":50, 
+            "height":50, 
+            "population_frac":0.5, 
+            "similarity_threshold":3,
+            "n_neighbors":8, 
+            "n_iterations":500
+        }
 
 if __name__ == '__main__':
 
-    similarity_thresholds = [float(i)/10.0 for i in range(1, 10, 1)]
 
-    schelling_1 = Schelling(50, 50, 0.3, similarity_thresholds[0], 500, 2)
-    schelling_1.populate()
-    if not os.path.isdir("./out"):
-        os.makedirs("./out")
+    exp1 = experimentFactory("SchellingModel","SchellingModel_1")
+    exp1.create_experiment(CONFIG)
+    exp1.perform_experiment()
+    exp1.create_gif()
+    del exp1
 
-    schelling_1.plot('Schelling Model with 2 colors: Initial State', 'out/schelling_2_initial.png')
-    for _thresh in similarity_thresholds:
-        schelling_1 = Schelling(50, 50, 0.3, _thresh, 500, 2)
-        schelling_1.populate()
-        schelling_1.update() 
-        schelling_1.plot('Schelling Model with 2 colors: Final State with Similarity Threshold {} %'.format(int(_thresh*100)), 'out/schelling_2_{}_final.png'.format(int(_thresh*100)))
+    CONFIG["population_frac"] = 0.9
+    CONFIG["similarity_threshold"] = 3
+    exp2 = experimentFactory("SchellingModel","SchellingModel_2")
+    exp2.create_experiment(CONFIG)
+    exp2.perform_experiment()
+    exp2.create_gif()
+    del exp2
+
+    CONFIG["population_frac"] = 0.5
+    CONFIG["similarity_threshold"] = 4
+    exp3 = experimentFactory("SchellingModel","SchellingModel_3")
+    exp3.create_experiment(CONFIG)
+    exp3.perform_experiment()
+    exp3.create_gif()
+    del exp3
+
+    CONFIG["population_frac"] = 0.9
+    CONFIG["similarity_threshold"] = 4
+    exp4 = experimentFactory("SchellingModel","SchellingModel_4")
+    exp4.create_experiment(CONFIG)
+    exp4.perform_experiment()
+    exp4.create_gif()
+    del exp4
+
