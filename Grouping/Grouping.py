@@ -1,8 +1,11 @@
 from __future__ import print_function
 import numpy as np
 import time
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
+import pylab as plt
 import traceback
+import sys
+
 
 np.random.seed(41)
 plt.ion()
@@ -16,7 +19,7 @@ class Node(object):
     States - Susceptible , Refractory
     The node dies after it was inactive for more than 1/P time. 
     """
-    def __init__(self, R=20, P=0.3):
+    def __init__(self, R=50, P=0.3):
         self.is_initialized = False
         self.is_susceptible = False 
         self.signal = 0
@@ -25,6 +28,7 @@ class Node(object):
         self.refractory_timer = R
         self.P = P
         self.counter = 0
+        self.group_size = 0
     
     def step(self, neighbour_signalled):
         """
@@ -54,6 +58,7 @@ class Node(object):
             Updates its states and timers
         """
         self.signal = 1
+        self.group_size += 1
         self.is_susceptible = False
         self.refractory_timer = self.R
     
@@ -68,15 +73,20 @@ class Node(object):
             Check if the node is dead
         """
         return self.counter > (1.0/self.P)
+    
+    def get_group_size(self):
+        return self.group_size
 
 class Grid(object):
     """
         Grid is a 2D environment for all the Nodes
     """
-    def __init__(self, grid_size = (10,10)):
+    def __init__(self, grid_size = (20,20)):
         self.width  = grid_size[0]
         self.height = grid_size[1]
-        self.grid = [[Node(P=np.random.rand()) for i in range(self.width)] for j in range(self.height)]
+        # self.grid = [[Node(P=np.random.rand()) for i in range(self.width)] for j in range(self.height)]
+        self.grid = [[Node(P=0.01) for i in range(self.width)] for j in range(self.height)]
+
         self.display_grid = np.zeros((self.width,self.height))
 
         self.four_neighbours = lambda i,j:[        (i,j-1),
@@ -88,7 +98,8 @@ class Grid(object):
                                             (i-1,j+1),(i,j+1),(i+1,j+1)
                                                 ]
 
-        self.disp_window = ax.imshow(self.display_grid)
+        # self.disp_window = ax.imshow(self.display_grid)
+        # plt.show()
     
     def step(self):
         """
@@ -126,18 +137,31 @@ class Grid(object):
                     return True
         return False
 
+    def get_group_size(self):
+        self.group_size_grid = np.copy(self.display_grid)
+        for i in range(self.width):
+            for j in range(self.height):
+                self.group_size_grid[i,j] = self.grid[i][j].get_group_size()
+        
+        print("Group Size")
+        print(np.array2string(self.group_size_grid, precision=2, separator='', suppress_small=True), sep='\r')
+
     def print_grid(self):
         """
             visualizing the Environment
         """
-        # print("-"*80)
+        print("-"*80)
         # print(self.display_grid)
+        print(np.array2string(self.display_grid, precision=2, separator='', suppress_small=True), sep='\r')
         # fig.gcf().clear()
-        ax.imshow(self.display_grid)
+        # ax.imshow(self.display_grid)
         # ax.grid(False)
         # self.disp_window.set_data(self.display_grid)
-        fig.canvas.draw()
-        fig.canvas.flush_events()
+        # fig.canvas.draw()
+        # fig.canvas.flush_events()
+        sys.stdout.flush()
+        time.sleep(0.01)
+
     
     def run(self):
         """
@@ -147,7 +171,7 @@ class Grid(object):
         is_done = False
         while not is_done:
             try:
-                print("tik:",tik)
+                # print("tik:",tik)
                 is_done = self.step()
                 tik+=1
                 
@@ -158,6 +182,7 @@ class Grid(object):
                 traceback.print_exc(e)
                 quit()
         print("DONE")
+        self.get_group_size()
 
 
 if __name__ == "__main__":
