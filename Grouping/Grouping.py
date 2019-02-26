@@ -133,9 +133,9 @@ class Grid(object):
         # print("-"*80)
         # print(self.display_grid)
         # fig.gcf().clear()
-        # ax.imshow(self.display_grid)
+        ax.imshow(self.display_grid)
         # ax.grid(False)
-        self.disp_window.set_data(self.display_grid)
+        # self.disp_window.set_data(self.display_grid)
         fig.canvas.draw()
         fig.canvas.flush_events()
     
